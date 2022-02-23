@@ -5,6 +5,8 @@ import tempfile
 
 import click
 
+from nixos_command import flags
+
 
 def printDebug(text):
     if "NIXOS_COMMAND_DEBUG" in os.environ and os.environ["NIXOS_COMMAND_DEBUG"] == "1":
@@ -74,13 +76,6 @@ def run():
     pass
 
 
-def activationCommandSettings(f):
-    f = click.argument("nixargs", nargs=-1)(f)
-    f = click.argument("installable", default=".#")(f)
-    f = click.option("-p","--profile-name", help="Profile in which NixOS will be installed", type=click.Path())(f)
-    return f
-
-
 def activationCommand(profile_name, installable, nixargs, action):
     toplevel = normalizeNixosFlakeRef(installable)
     performSwitchAction(
@@ -95,40 +90,40 @@ def buildCommand(installable, nixargs, attribute="toplevel"):
 
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Build the new configuration.")
-@click.argument("installable", default=".#")
-@click.argument("nixargs", nargs=-1)
+@flags.withInstallable
+@flags.passToNix
 def build(installable, nixargs):
     return buildCommand(installable, nixargs)
 
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Build a VM for testing.")
 @click.option("-b","--bootloader", help="Build a VM with bootloader.", default=False, is_flag=True)
-@click.argument("installable", default=".#")
-@click.argument("nixargs", nargs=-1)
+@flags.withInstallable
+@flags.passToNix
 def build_vm(bootloader, installable, nixargs):
     return buildCommand(installable, nixargs, attribute="vmWithBootLoader" if bootloader else "vm")
 
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Build and activate the new configuration for testing. Does not create a boot entry.")
-@activationCommandSettings
+@flags.activationCommand
 def test(profile_name, installable, nixargs):
     return activationCommand(profile_name, installable, nixargs, "test")
     
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Build the new configuration and make it the boot default.")
-@activationCommandSettings
+@flags.activationCommand
 def boot(profile_name, installable, nixargs):
     return activationCommand(profile_name, installable, nixargs, "boot")
 
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Build and activate the new configuration, and make it the boot default.")
-@activationCommandSettings
+@flags.activationCommand
 def switch(profile_name, installable, nixargs):
     return activationCommand(profile_name, installable, nixargs, "switch")
 
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Alias for 'switch'")
-@activationCommandSettings
+@flags.activationCommand
 def apply(profile_name, installable, nixargs):
     return activationCommand(profile_name, installable, nixargs, "switch")
 
