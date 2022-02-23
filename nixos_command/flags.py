@@ -7,7 +7,7 @@ def withInstallable(f):
 
 
 def withProfile(f):
-    f = click.option("-p","--profile-name", help="Profile in which NixOS will be installed", type=click.Path())(f)
+    f = click.option("-p","--profile-name", help="Profile in which NixOS will be installed")(f)
     return f
 
 
