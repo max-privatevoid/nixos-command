@@ -71,7 +71,7 @@ def activationCommand(profile_name, installable, nixargs, action):
         nixargs,
         action)
     
-def buildCommand(installable, nixargs, attribute="toplevel"):
+def buildCommand(installable, nixargs, attribute="config.system.build.toplevel"):
     toplevel = transform.normalizeNixosFlakeRef(installable, attribute=attribute)
     realiseNixosConfiguration(toplevel, nixargs, result="result")
 
