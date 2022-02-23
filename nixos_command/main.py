@@ -114,6 +114,17 @@ def switch(profile_name, installable, nixargs):
 def apply(profile_name, installable, nixargs):
     return activationCommand(profile_name, installable, nixargs, "switch")
 
+
+@run.command(context_settings={"ignore_unknown_options": True}, help="Show the history of the system closure.")
+@flags.withProfile
+def history(profile_name):
+    nix = [ "nix", "profile", "diff-closures",
+        "--profile",
+        transform.getProfilePath(profile_name)
+    ]
+    printDebug(nix)
+    return subprocess.run(nix).returncode == 0
+
     
 if __name__ == "__main__":
     run()
