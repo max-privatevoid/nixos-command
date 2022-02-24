@@ -125,6 +125,23 @@ def history(profile_name):
     printDebug(nix)
     return subprocess.run(nix).returncode == 0
 
-    
+
+@run.command(context_settings={"ignore_unknown_options": True}, help="Evaluate an attribute of the configuration.")
+@flags.withInstallable
+@click.argument("expr", required=False)
+def eval(installable, expr):
+    # HACK: if expr is not given, try using installable as expr instead
+    if not expr:
+        # if it's set to the default, assume user is running "nixos eval", in which case we suggest to give an expr
+        if installable == ".#":
+            raise click.UsageError("Expected an expresssion")
+        return eval((".#", installable))
+
+    toplevel = transform.normalizeNixosFlakeRef(installable, attribute=f"config.{expr}")
+    nix = [ "nix", "eval", toplevel ]
+    printDebug(nix)
+    return subprocess.run(nix).returncode == 0
+
+
 if __name__ == "__main__":
     run()
