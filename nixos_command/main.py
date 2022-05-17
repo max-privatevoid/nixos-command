@@ -129,7 +129,8 @@ def history(profile_name):
 @run.command(context_settings={"ignore_unknown_options": True}, help="Evaluate an attribute of the configuration.")
 @flags.withInstallable
 @click.argument("expr", required=False)
-def eval(installable, expr):
+@flags.passToNix
+def eval(installable, expr, nixargs):
     # HACK: if expr is not given, try using installable as expr instead
     if not expr:
         # if it's set to the default, assume user is running "nixos eval", in which case we suggest to give an expr
@@ -139,6 +140,7 @@ def eval(installable, expr):
 
     toplevel = transform.normalizeNixosFlakeRef(installable, attribute=f"config.{expr}")
     nix = [ "nix", "eval", toplevel ]
+    nix.extend(nixargs)
     printDebug(nix)
     return subprocess.run(nix).returncode == 0
 
