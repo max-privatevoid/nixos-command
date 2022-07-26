@@ -88,7 +88,7 @@ def build(installable, nixargs):
 @flags.withInstallable
 @flags.passToNix
 def build_vm(bootloader, installable, nixargs):
-    return buildCommand(installable, nixargs, attribute="vmWithBootLoader" if bootloader else "vm")
+    return buildCommand(installable, nixargs, attribute="config.system.build.vmWithBootLoader" if bootloader else "config.system.build.vm")
 
 
 @run.command(context_settings={"ignore_unknown_options": True}, help="Build and activate the new configuration for testing. Does not create a boot entry.")
