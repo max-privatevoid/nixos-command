@@ -33,16 +33,16 @@
 
         defaultPackage = pkgs.nixos-command;
 
-        devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [
+        devShell = with pkgs; mkShell rec {
+          buildInputs =[
             poetry
-            nixos-command.dependencyEnv
+            pythonEnv
           ];
           
-          PYTHON = pkgs.nixos-command.dependencyEnv.interpreter;
+          pythonEnv = nixos-command.python.withPackages (_: nixos-command.requiredPythonModules);
 
-          inputsFrom = builtins.attrValues self.packages.${system};
-          
+          PYTHON = pythonEnv.interpreter;
+
           shellHook = ''
             alias nixos="python3 -m nixos_command.main"
           '';
