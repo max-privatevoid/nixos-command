@@ -27,13 +27,12 @@
         };
       in
       {
-        packages = {
-          nixos-command = pkgs.nixos-command;
+        packages = rec {
+          inherit (pkgs) nixos-command;
+          default = nixos-command;
         };
 
-        defaultPackage = pkgs.nixos-command;
-
-        devShell = with pkgs; mkShell rec {
+        devShells.default = with pkgs; mkShell rec {
           buildInputs =[
             poetry
             pythonEnv
