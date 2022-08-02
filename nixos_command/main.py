@@ -1,5 +1,6 @@
 import os
 import platform
+import shutil
 import subprocess
 import tempfile
 
@@ -12,6 +13,16 @@ def printDebug(text):
     if "NIXOS_COMMAND_DEBUG" in os.environ and os.environ["NIXOS_COMMAND_DEBUG"] == "1":
         print(text)
 
+
+def getOptionalRootCommand():
+    if os.getuid() != 0:
+        commands = ["doas", "sudo"]
+        for cmd in commands:
+            if (c := shutil.which(cmd)) is not None:
+                return [c]
+        click.echo("warning: did not find a suitable privilege elevation command")
+
+    return []
 
 def realiseNixosConfiguration(toplevel, nixargs, result, fromFile=False, fromExpr=False):
     nix = [ "nix", "build" ]
@@ -38,13 +49,13 @@ def setNixProfile(profile, result):
             click.echo(f"While creating profile directory: {e}")
             return False
         
-    nix = [ "nix-env", "--profile", profile, "--set", result]
+    nix = getOptionalRootCommand() + [ "nix-env", "--profile", profile, "--set", result]
     printDebug(nix)
     return subprocess.run(nix).returncode == 0
 
 
 def activateNixosConfiguration(result, mode):
-    switch = [ os.path.join(result, "bin", "switch-to-configuration"), mode ]
+    switch = getOptionalRootCommand() + [ os.path.join(result, "bin", "switch-to-configuration"), mode ]
     printDebug(switch)
     return subprocess.run(switch).returncode == 0
 
