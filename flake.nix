@@ -32,7 +32,7 @@
           default = nixos-command;
         };
 
-        devShells.default = with pkgs; mkShell rec {
+        devShells.default = with pkgs; mkShellNoCC rec {
           buildInputs =[
             poetry
             pythonEnv
