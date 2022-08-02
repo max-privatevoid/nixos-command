@@ -7,7 +7,7 @@ def withInstallable(f):
 
 
 def withProfile(f):
-    f = click.option("-p","--profile-name", help="NixOS system profile name")(f)
+    f = click.option("-p", "--profile-name", help="NixOS system profile name")(f)
     return f
 
 
