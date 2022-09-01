@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nixos-command"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["Max <max@privatevoid.net>"]
 license = "AGPL-3.0"
