@@ -9,13 +9,22 @@ import click
 from nixos_command import flags, transform
 
 
+def getEnv(key):
+    if key in os.environ and os.environ[key] != "":
+        return os.environ[key]
+    else:
+        return None
+
+
 def printDebug(text):
-    if "NIXOS_COMMAND_DEBUG" in os.environ and os.environ["NIXOS_COMMAND_DEBUG"] == "1":
+    if getEnv("NIXOS_COMMAND_DEBUG") == "1":
         print(text)
 
 
 def getOptionalRootCommand():
     if os.getuid() != 0:
+        if cmd := getEnv("NIXOS_COMMAND_SUDO"):
+            return [cmd]
         commands = ["doas", "sudo"]
         for cmd in commands:
             if (c := shutil.which(cmd)) is not None:
